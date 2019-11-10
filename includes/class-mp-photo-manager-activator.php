@@ -32,30 +32,61 @@ class Mp_Photo_Manager_Activator
 	 */
 	public static function activate()
 	{
+		ob_start();
 		MP_Photo_Manager_Activator::create_db();
+		//var_dump(ob_get_contents());
+
 	}
 
 	public static function create_db()
 	{
 		global $wpdb;
 
-		// Create database.
-		$qry = "CREATE DATABASE IF NOT EXISTS mp_photo_manager";
+		$dbName = "mp_photo_manager";
 
+		// Create database.
+		$qry = "CREATE DATABASE IF NOT EXISTS {$dbName}";
 		$wpdb->get_results($qry);
-		// var_dump();
+
+		// $qry = "USE mp_photo_manager";
+		// $wpdb->get_results($qry);
+		// var_dump($wpdb->print_error());
 		// exit;
 
-		$qry = "USE mp_photo_manager";
-		$wpdb->get_results($qry);
-
 		// Create Albums table.
-		$qry = "CREATE TABLE IF NOT EXISTS albums";
-		var_dump($wpdb->get_results($qry));
-		exit;
-
-		// // Create Photos table.
-		$qry = "CREATE TABLE IF NOT EXISTS photos";
+		$qry = "CREATE TABLE IF NOT EXISTS {$dbName}.albums (
+					id INT AUTO_INCREMENT,
+					user_id INT,
+					title VARCHAR(255) NOT NULL,
+					desciption VARCHAR(1023),
+					created DATE NOT NULL,
+					updated DATE,
+					PRIMARY KEY (id))";
 		$wpdb->get_results($qry);
+
+		// Create Photos table.
+		$qry = "CREATE TABLE IF NOT EXISTS {$dbName}.photos (
+					id INT AUTO_INCREMENT,
+					user_id INT,
+					title VARCHAR(255) NOT NULL,
+					desciption VARCHAR(1023),
+					created DATE NOT NULL,
+					updated DATE,
+					PRIMARY KEY (id))";
+		$wpdb->get_results($qry);
+
+		// Create Photos/Albums intersection table.
+		$qry = "CREATE TABLE IF NOT EXISTS $dbName.photos_albums (
+					id INT NOT NULL AUTO_INCREMENT,
+					photo_id INT NOT NULL,
+					album_id INT NOT NULL,
+					added DATE NOT NULL,
+					FOREIGN KEY (photo_id) REFERENCES photos(id),
+					FOREIGN KEY (album_id) REFERENCES albums(id),
+					PRIMARY KEY (id),
+					UNIQUE KEY pkey (photo_id, album_id))";
+		$wpdb->get_results($qry);
+		// var_dump($wpdb->print_error());
+		//exit;
 	}
 }
