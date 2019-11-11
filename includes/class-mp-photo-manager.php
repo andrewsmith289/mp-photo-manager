@@ -80,6 +80,7 @@ class Mp_Photo_Manager
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+		$this->define_shortcodes();
 	}
 
 	/**
@@ -123,6 +124,8 @@ class Mp_Photo_Manager
 		 * side of the site.
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-mp-photo-manager-public.php';
+
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-mp-photo-manager-db.php';
 
 		$this->loader = new Mp_Photo_Manager_Loader();
 	}
@@ -169,11 +172,24 @@ class Mp_Photo_Manager
 	 */
 	private function define_public_hooks()
 	{
-
 		$plugin_public = new Mp_Photo_Manager_Public($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+
+		// Register AJAX actions for Photo Manager.
+		$this->loader->add_action('wp_ajax_mp_create_album', $plugin_public, 'mp_create_album');
+	}
+
+	/**
+	 * Register the plugin shortcodes.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_shortcodes()
+	{
+		add_shortcode('mp-photo-manager', array($this, 'mp_album_manager_shortcode'));
 	}
 
 	/**
@@ -221,57 +237,26 @@ class Mp_Photo_Manager
 	}
 
 	/**
-	 * Creates a new album.
+	 * Renders the Album Manager Shortcode.
 	 *
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function create_album()
+	public function mp_album_manager_shortcode()
 	{
-		// Create album
-	}
+		$nonce = wp_create_nonce("mp_create_album_nonce");
+		// $link = admin_url("admin-ajax.php?action=mp_create_album&name=john&nonce={$nonce}");
+		$link = admin_url("admin-ajax.php");
+		return "
+			<form action='{$link}' method='post'>
+			Name: <input type='text' name='name'><br>
+			Description: <input type='textarea' name='desc'><br>
+			<input type='hidden' name='nonce' value='{$nonce}' />
+			<input type='hidden' name='action' value='mp_create_album' />
 
-	/**
-	 * Deletes an album.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The version number of the plugin.
-	 */
-	public function delete_album()
-	{
-		// Delete album
-	}
-
-	/**
-	 * Adds a photo to an album.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The version number of the plugin.
-	 */
-	public function add_photo()
-	{
-		// Add photo to album
-	}
-
-	/**
-	 * Removes a photo from an album.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The version number of the plugin.
-	 */
-	public function remove_photo()
-	{
-		// Add photo to album
-	}
-
-	/**
-	 * Deletes a photo.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The version number of the plugin.
-	 */
-	public function delete_photo()
-	{
-		// Deletes photo from album
+			<input type='submit'>
+			</form>
+		";
+		// return "<a class=\"user_vote\" data-nonce=\"{$nonce}\" href=\"$link\">Create Album</a>";
 	}
 }
