@@ -152,11 +152,7 @@ class Mp_Photo_Manager_Db
     $album_id = esc_sql($album_id);
 
     // Check Album exists and belongs to user.
-    $qry = "SELECT * FROM {$dbName}.albums 
-      WHERE user_id={$userId} AND id={$album_id}";
-    $result = $wpdb->get_results($qry);
-
-    if (count($result) == 0) {
+    if (!Mp_Photo_Manager_Db::album_exists($album_id)) {
       echo "Album not found in database, or doesn't belong to you.";
       return;
     }
@@ -203,6 +199,31 @@ class Mp_Photo_Manager_Db
   }
 
   /**
+   * Determies if a given Album exists for this user.
+   *
+   * @since     1.0.0
+   */
+  private static function album_exists($album_id)
+  {
+    // Check Photo exists and belongs to user.
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+
+    // Check Photo exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Album not found in database, or doesn't belong to you.";
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Adds a photo to an album.
    *
    * @since     1.0.0
@@ -213,26 +234,18 @@ class Mp_Photo_Manager_Db
     global $wpdb;
     $dbName = "mp_photo_manager";
 
-    $userId = get_current_user_id();
     $now = time();
-
     $album_id = esc_sql($album_id);
     $photo_id = esc_sql($photo_id);
 
     // Check Album exists and belongs to user.
-    $qry = "SELECT * FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id}";
-    $result = $wpdb->get_results($qry);
-
-    if (count($result) == 0) {
+    if (!Mp_Photo_Manager_Db::album_exists($album_id)) {
       echo "Album not found in database, or doesn't belong to you.";
       return;
     }
 
     // Check Photo exists and belongs to user.
-    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
-    $result = $wpdb->get_results($qry);
-
-    if (count($result) == 0) {
+    if (!Mp_Photo_Manager_Db::photo_exists($photo_id)) {
       echo "Photo not found in database, or doesn't belong to you.";
       return;
     }
@@ -240,7 +253,7 @@ class Mp_Photo_Manager_Db
     // Add photo to album
     $qry = "INSERT INTO {$dbName}.photos_albums (album_id, photo_id, added) 
       VALUES ({$album_id}, {$photo_id}, FROM_UNIXTIME({$now}))";
-    $result = $wpdb->get_results($qry);
+    $wpdb->get_results($qry);
   }
 
   /**
@@ -275,26 +288,17 @@ class Mp_Photo_Manager_Db
     global $wpdb;
     $dbName = "mp_photo_manager";
 
-    $userId = get_current_user_id();
-    $now = time();
-
     $album_id = esc_sql($album_id);
     $photo_id = esc_sql($photo_id);
 
     // Check Album exists and belongs to user.
-    $qry = "SELECT * FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id}";
-    $result = $wpdb->get_results($qry);
-
-    if (count($result) == 0) {
+    if (!Mp_Photo_Manager_Db::album_exists($album_id)) {
       echo "Album not found in database, or doesn't belong to you.";
       return;
     }
 
     // Check Photo exists and belongs to user.
-    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
-    $result = $wpdb->get_results($qry);
-
-    if (count($result) == 0) {
+    if (!Mp_Photo_Manager_Db::photo_exists($photo_id)) {
       echo "Photo not found in database, or doesn't belong to you.";
       return;
     }
@@ -373,7 +377,6 @@ class Mp_Photo_Manager_Db
     return $result;
   }
 
-
   /**
    * Updates a user's photo.
    *
@@ -383,8 +386,6 @@ class Mp_Photo_Manager_Db
   {
     global $wpdb;
     $dbName = "mp_photo_manager";
-
-    $userId = get_current_user_id();
     $now = time();
 
     $id = esc_sql($id);
@@ -393,10 +394,7 @@ class Mp_Photo_Manager_Db
     $path = esc_sql($path);
 
     // Check Photo exists and belongs to user.
-    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$id}";
-    $result = $wpdb->get_results($qry);
-
-    if (count($result) == 0) {
+    if (!Mp_Photo_Manager_Db::photo_exists($id)) {
       echo "Photo not found in database, or doesn't belong to you.";
       return;
     }
@@ -422,10 +420,7 @@ class Mp_Photo_Manager_Db
     $photo_id = esc_sql($photo_id);
 
     // Check Photo exists and belongs to user.
-    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
-    $result = $wpdb->get_results($qry);
-
-    if (count($result) == 0) {
+    if (!Mp_Photo_Manager_Db::photo_exists($photo_id)) {
       echo "Photo not found in database, or doesn't belong to you.";
       return;
     }
@@ -433,5 +428,29 @@ class Mp_Photo_Manager_Db
     // Delete Photo
     $qry = "DELETE FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
     $wpdb->get_results($qry);
+  }
+
+  /**
+   * Determies if a given Photo exists for this user.
+   *
+   * @since     1.0.0
+   */
+  private static function photo_exists($photo_id)
+  {
+    // Check Photo exists and belongs to user.
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+    $userId = get_current_user_id();
+
+    // Check Photo exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Photo not found in database, or doesn't belong to you.";
+      return false;
+    }
+
+    return true;
   }
 }
