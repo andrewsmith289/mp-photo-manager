@@ -119,6 +119,35 @@ class Mp_Photo_Manager_Public
 	}
 
 	/**
+	 * Ajax callback for the Get Album action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_get_album()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_get_album_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+
+		wp_die(json_encode(Mp_Photo_Manager_Db::get_album($id)));
+	}
+
+	/**
+	 * Ajax callback for the Get Albums action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_get_albums()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_get_albums_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+
+		wp_die(json_encode(Mp_Photo_Manager_Db::get_albums()));
+	}
+
+	/**
 	 * Ajax callback for the Delete Album action.
 	 *
 	 * @since    1.0.0
@@ -131,5 +160,158 @@ class Mp_Photo_Manager_Public
 		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
 
 		Mp_Photo_Manager_Db::delete_album($id);
+	}
+
+	/**
+	 * Ajax callback for the Update Album action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_update_album()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_update_album_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+		$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+		$desc = filter_input(INPUT_POST, 'desc', FILTER_SANITIZE_STRING);
+
+		Mp_Photo_Manager_Db::update_album($id, $name, $desc);
+	}
+
+	/**
+	 * Ajax callback for the Create Photo action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_create_photo()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_create_photo_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+
+		$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+		$desc = filter_input(INPUT_POST, 'desc', FILTER_SANITIZE_STRING);
+		$path = filter_input(INPUT_POST, 'path', FILTER_SANITIZE_STRING);
+
+		Mp_Photo_Manager_Db::create_photo($name, $desc, $path);
+	}
+
+	/**
+	 * Ajax callback for the Get Photo action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_get_photo()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_get_photo_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+
+		wp_die(json_encode(Mp_Photo_Manager_Db::get_photo($id)));
+	}
+
+	/**
+	 * Ajax callback for the Get Photos action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_get_photos()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_get_photos_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+
+		wp_die(json_encode(Mp_Photo_Manager_Db::get_photos()));
+	}
+
+	/**
+	 * Ajax callback for the Update Photo action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_update_photo()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_update_photo_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+
+		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+		$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+		$desc = filter_input(INPUT_POST, 'desc', FILTER_SANITIZE_STRING);
+		$path = filter_input(INPUT_POST, 'path', FILTER_SANITIZE_STRING);
+
+		Mp_Photo_Manager_Db::update_photo($id, $name, $desc, $path);
+	}
+
+	/**
+	 * Ajax callback for the Update Photo action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_delete_photo()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_delete_photo_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+
+		$photo_id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+
+
+		Mp_Photo_Manager_Db::delete_photo($photo_id);
+	}
+
+	/**
+	 * Ajax callback for the Add Photo to Album action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_add_album_photo()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_add_album_photo_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+
+		$photo_id = filter_input(INPUT_POST, 'photo_id', FILTER_SANITIZE_STRING);
+		$album_id = filter_input(INPUT_POST, 'album_id', FILTER_SANITIZE_STRING);
+
+
+		Mp_Photo_Manager_Db::add_album_photo($album_id, $photo_id);
+	}
+
+	/**
+	 * Ajax callback for the Get Album Photos action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_get_album_photos()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_get_album_photos_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+
+		$album_id = filter_input(INPUT_POST, 'album_id', FILTER_SANITIZE_STRING);
+
+
+		wp_die(json_encode(Mp_Photo_Manager_Db::get_album_photos($album_id)));
+	}
+
+	/**
+	 * Ajax callback for the Delete Photo from Album action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_delete_album_photo()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_delete_album_photo_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+
+		$photo_id = filter_input(INPUT_POST, 'photo_id', FILTER_SANITIZE_STRING);
+		$album_id = filter_input(INPUT_POST, 'album_id', FILTER_SANITIZE_STRING);
+
+
+		Mp_Photo_Manager_Db::delete_album_photo($album_id, $photo_id);
 	}
 }

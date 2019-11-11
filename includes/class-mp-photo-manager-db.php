@@ -35,10 +35,22 @@ class Mp_Photo_Manager_Db
 					user_id INT,
 					title VARCHAR(255) NOT NULL,
 					description VARCHAR(1023),
+          path VARCHAR(512),
 					created DATETIME NOT NULL,
 					updated DATETIME,
 					PRIMARY KEY (id))";
     $wpdb->get_results($qry);
+
+    // Create Photos/Albums intersection table.
+    // $qry = "CREATE TABLE IF NOT EXISTS $dbName.photos_albums (
+    // 			id INT NOT NULL AUTO_INCREMENT,
+    // 			photo_id INT NOT NULL,
+    // 			album_id INT NOT NULL,
+    // 			added DATE NOT NULL,
+    // 			FOREIGN KEY (photo_id) REFERENCES photos(id),
+    // 			FOREIGN KEY (album_id) REFERENCES albums(id),
+    // 			PRIMARY KEY (id),
+    //       UNIQUE KEY pkey (photo_id, album_id))";
 
     // Create Photos/Albums intersection table.
     $qry = "CREATE TABLE IF NOT EXISTS $dbName.photos_albums (
@@ -46,13 +58,8 @@ class Mp_Photo_Manager_Db
 					photo_id INT NOT NULL,
 					album_id INT NOT NULL,
 					added DATE NOT NULL,
-					FOREIGN KEY (photo_id) REFERENCES photos(id),
-					FOREIGN KEY (album_id) REFERENCES albums(id),
-					PRIMARY KEY (id),
-					UNIQUE KEY pkey (photo_id, album_id))";
+					PRIMARY KEY (id))";
     $wpdb->get_results($qry);
-    // var_dump($wpdb->print_error());
-    //exit;
   }
 
   /**
@@ -63,7 +70,7 @@ class Mp_Photo_Manager_Db
    */
   public static function create_album($name, $desc = "")
   {
-    // Create album
+
     global $wpdb;
     $dbName = "mp_photo_manager";
 
@@ -73,11 +80,62 @@ class Mp_Photo_Manager_Db
     $name = esc_sql($name);
     $desc = esc_sql($desc);
 
+    // Create album
     $qry = "INSERT INTO {$dbName}.albums (user_id, title, description, created, updated)
       VALUES ({$userId}, '{$name}', '{$desc}', FROM_UNIXTIME({$now}), FROM_UNIXTIME({$now}))
     ";
     $wpdb->get_results($qry);
   }
+
+  /**
+   * Gets an album.
+   *
+   * @since     1.0.0
+   * @return    string    The version number of the plugin.
+   */
+  public static function get_album($id)
+  {
+
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+    $id = esc_sql($id);
+
+    // Check Album exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.albums 
+      WHERE user_id={$userId} AND id={$id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Album not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    // Return the album
+    return $result;
+  }
+
+  /**
+   * Gets user's Albums.
+   *
+   * @since     1.0.0
+   * @return    string    The version number of the plugin.
+   */
+  public static function get_albums()
+  {
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+    $userId = get_current_user_id();
+
+    // Get Photos.
+    $qry = "SELECT * FROM {$dbName}.albums 
+      WHERE user_id={$userId}";
+    $result = $wpdb->get_results($qry);
+
+    return $result;
+  }
+
 
   /**
    * Deletes an album.
@@ -94,8 +152,8 @@ class Mp_Photo_Manager_Db
     $album_id = esc_sql($album_id);
 
     // Check Album exists and belongs to user.
-    $qry = "SELECT * FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id} 
-    ";
+    $qry = "SELECT * FROM {$dbName}.albums 
+      WHERE user_id={$userId} AND id={$album_id}";
     $result = $wpdb->get_results($qry);
 
     if (count($result) == 0) {
@@ -104,11 +162,44 @@ class Mp_Photo_Manager_Db
     }
 
     // Delete Album
-    $qry = "DELETE FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id} 
-    ";
+    $qry = "DELETE FROM {$dbName}.albums 
+      WHERE user_id={$userId} AND id={$album_id}";
     $wpdb->get_results($qry);
+  }
 
-    echo "Album deleted.";
+  /**
+   * Updates an album's details.
+   *
+   * @since     1.0.0
+   * @return    string    The version number of the plugin.
+   */
+  public static function update_album($id, $name, $desc)
+  {
+    // Update album details
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+    $now = time();
+
+    $id = esc_sql($id);
+    $name = esc_sql($name);
+    $desc = esc_sql($desc);
+
+    // Check Album exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.albums WHERE user_id={$userId} AND id={$id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Album not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    $qry = "UPDATE {$dbName}.albums 
+      SET title='{$name}', description='{$desc}', updated=FROM_UNIXTIME({$now}) 
+      WHERE id={$id} 
+    ";
+    $result = $wpdb->get_results($qry);
   }
 
   /**
@@ -117,30 +208,230 @@ class Mp_Photo_Manager_Db
    * @since     1.0.0
    * @return    string    The version number of the plugin.
    */
-  public static function add_album_photo($album_id, $photo_path)
+  public static function add_album_photo($album_id, $photo_id)
   {
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+    $now = time();
+
+    $album_id = esc_sql($album_id);
+    $photo_id = esc_sql($photo_id);
+
+    // Check Album exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Album not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    // Check Photo exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Photo not found in database, or doesn't belong to you.";
+      return;
+    }
+
     // Add photo to album
+    $qry = "INSERT INTO {$dbName}.photos_albums (album_id, photo_id, added) 
+      VALUES ({$album_id}, {$photo_id}, FROM_UNIXTIME({$now}))";
+    $result = $wpdb->get_results($qry);
   }
 
   /**
-   * Removes a photo from an album.
+   * Gets Album Photos.
    *
    * @since     1.0.0
-   * @return    string    The version number of the plugin.
    */
-  public static function remove_album_photo($id)
+  public static function get_album_photos($album_id)
   {
-    // Add photo to album
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+    $userId = get_current_user_id();
+
+    // Get Photos.
+    $qry = "SELECT photo_id, album_id, photos.description, path, added, photos.created, photos.updated FROM {$dbName}.photos_albums
+      INNER JOIN {$dbName}.albums on photos_albums.album_id = albums.id
+      INNER JOIN {$dbName}.photos on photos_albums.photo_id = photos.id    
+      WHERE albums.id={$album_id} 
+        AND albums.user_id={$userId}";
+    $result = $wpdb->get_results($qry);
+
+    return $result;
   }
 
   /**
-   * Deletes a photo.
+   * Deletes a photo from an album.
    *
    * @since     1.0.0
-   * @return    string    The version number of the plugin.
    */
-  public static function delete_photo($id)
+  public static function delete_album_photo($album_id, $photo_id)
   {
-    // Deletes photo from album
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+    $now = time();
+
+    $album_id = esc_sql($album_id);
+    $photo_id = esc_sql($photo_id);
+
+    // Check Album exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Album not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    // Check Photo exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Photo not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    // Remove photo from album
+    $qry = "DELETE FROM {$dbName}.photos_albums WHERE album_id={$album_id} AND photo_id={$photo_id}";
+    $result = $wpdb->get_results($qry);
+  }
+
+  /**
+   * Adds a photo to user's photos.
+   *
+   * @since     1.0.0
+   */
+  public static function create_photo($name, $desc, $path)
+  {
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+    $now = time();
+
+    $name = esc_sql($name);
+    $desc = esc_sql($desc);
+    $path = esc_sql($path);
+
+    // Add new photo
+    $qry = "INSERT INTO {$dbName}.photos (user_id, title, description, path, created, updated)
+      VALUES ({$userId}, '{$name}', '{$desc}', '{$path}', FROM_UNIXTIME({$now}), FROM_UNIXTIME({$now}))";
+    $wpdb->get_results($qry);
+  }
+
+  /**
+   * Gets a photo.
+   *
+   * @since     1.0.0
+   */
+  public static function get_photo($id)
+  {
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+    $id = esc_sql($id);
+
+    // Check Photo exists and belongs to User.
+    $qry = "SELECT * FROM {$dbName}.photos 
+      WHERE user_id={$userId} AND id={$id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Photo not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    // Return the Photo
+    return $result;
+  }
+
+  /**
+   * Gets user's Photos.
+   *
+   * @since     1.0.0
+   */
+  public static function get_photos()
+  {
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+    $userId = get_current_user_id();
+
+    // Get Photos.
+    $qry = "SELECT * FROM {$dbName}.photos 
+      WHERE user_id={$userId}";
+    $result = $wpdb->get_results($qry);
+
+    return $result;
+  }
+
+
+  /**
+   * Updates a user's photo.
+   *
+   * @since     1.0.0
+   */
+  public static function update_photo($id, $name, $desc, $path)
+  {
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+    $now = time();
+
+    $id = esc_sql($id);
+    $name = esc_sql($name);
+    $desc = esc_sql($desc);
+    $path = esc_sql($path);
+
+    // Check Photo exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Photo not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    // Update photo details
+    $qry = "UPDATE {$dbName}.photos 
+      SET title='{$name}', description='{$desc}', path='{$path}', updated=FROM_UNIXTIME({$now}) 
+      WHERE id={$id}";
+    $wpdb->get_results($qry);
+  }
+
+  /**
+   * Deletes a user's photo.
+   *
+   * @since     1.0.0
+   */
+  public static function delete_photo($photo_id)
+  {
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+    $userId = get_current_user_id();
+
+    $photo_id = esc_sql($photo_id);
+
+    // Check Photo exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Photo not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    // Delete Photo
+    $qry = "DELETE FROM {$dbName}.photos WHERE user_id={$userId} AND id={$photo_id}";
+    $wpdb->get_results($qry);
   }
 }

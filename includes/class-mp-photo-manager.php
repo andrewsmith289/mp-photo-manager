@@ -179,7 +179,20 @@ class Mp_Photo_Manager
 
 		// Register AJAX actions for Photo Manager.
 		$this->loader->add_action('wp_ajax_mp_create_album', $plugin_public, 'mp_create_album');
+		$this->loader->add_action('wp_ajax_mp_get_album', $plugin_public, 'mp_get_album');
+		$this->loader->add_action('wp_ajax_mp_get_albums', $plugin_public, 'mp_get_albums');
 		$this->loader->add_action('wp_ajax_mp_delete_album', $plugin_public, 'mp_delete_album');
+		$this->loader->add_action('wp_ajax_mp_update_album', $plugin_public, 'mp_update_album');
+
+		$this->loader->add_action('wp_ajax_mp_create_photo', $plugin_public, 'mp_create_photo');
+		$this->loader->add_action('wp_ajax_mp_get_photo', $plugin_public, 'mp_get_photo');
+		$this->loader->add_action('wp_ajax_mp_get_photos', $plugin_public, 'mp_get_photos');
+		$this->loader->add_action('wp_ajax_mp_update_photo', $plugin_public, 'mp_update_photo');
+		$this->loader->add_action('wp_ajax_mp_delete_photo', $plugin_public, 'mp_delete_photo');
+
+		$this->loader->add_action('wp_ajax_mp_add_album_photo', $plugin_public, 'mp_add_album_photo');
+		$this->loader->add_action('wp_ajax_mp_get_album_photos', $plugin_public, 'mp_get_album_photos');
+		$this->loader->add_action('wp_ajax_mp_delete_album_photo', $plugin_public, 'mp_delete_album_photo');
 	}
 
 	/**
@@ -246,15 +259,46 @@ class Mp_Photo_Manager
 	public function mp_album_manager_shortcode()
 	{
 		$create_album_nonce = wp_create_nonce("mp_create_album_nonce");
+		$get_album_nonce = wp_create_nonce("mp_get_album_nonce");
+		$get_albums_nonce = wp_create_nonce("mp_get_albums_nonce");
 		$delete_album_nonce = wp_create_nonce("mp_delete_album_nonce");
-		// $link = admin_url("admin-ajax.php?action=mp_create_album&name=john&nonce={$nonce}");
+		$update_album_nonce = wp_create_nonce("mp_update_album_nonce");
+
+		$create_photo_nonce = wp_create_nonce("mp_create_photo_nonce");
+		$get_photo_nonce = wp_create_nonce("mp_get_photo_nonce");
+		$get_photos_nonce = wp_create_nonce("mp_get_photos_nonce");
+		$update_photo_nonce = wp_create_nonce("mp_update_photo_nonce");
+		$delete_photo_nonce = wp_create_nonce("mp_delete_photo_nonce");
+
+		$add_album_photo_nonce = wp_create_nonce("mp_add_album_photo_nonce");
+		$get_album_photos_nonce = wp_create_nonce("mp_get_album_photos_nonce");
+		$delete_album_photo_nonce = wp_create_nonce("mp_delete_album_photo_nonce");
+
 		$link = admin_url("admin-ajax.php");
 		return "
+			<h1> Create Album </h1>
 			<form action='{$link}' method='post'>
 			Name: <input type='text' name='name'><br>
 			Description: <input type='textarea' name='desc'><br>
 			<input type='hidden' name='nonce' value='{$create_album_nonce}' />
 			<input type='hidden' name='action' value='mp_create_album' />
+
+			<input type='submit'>
+			</form>
+
+			<h1> Get Album </h1>
+			<form action='{$link}' method='post'>
+			id: <input type='text' name='id'><br>
+			<input type='hidden' name='nonce' value='{$get_album_nonce}' />
+			<input type='hidden' name='action' value='mp_get_album' />
+
+			<input type='submit'>
+			</form>
+
+			<h1> Get Albums </h1>
+			<form action='{$link}' method='post'>
+			<input type='hidden' name='nonce' value='{$get_albums_nonce}' />
+			<input type='hidden' name='action' value='mp_get_albums' />
 
 			<input type='submit'>
 			</form>
@@ -269,7 +313,105 @@ class Mp_Photo_Manager
 			<input type='submit'>
 			</form>
 
+			<hr />
+			<h1> Update Album </h1>
+			<form action='{$link}' method='post'>
+			id: <input type='text' name='id'><br>
+			Name: <input type='text' name='name'><br>
+			Description: <input type='textarea' name='desc'><br>
+			<input type='hidden' name='nonce' value='{$update_album_nonce}' />
+			<input type='hidden' name='action' value='mp_update_album' />
+
+			<input type='submit'>
+			</form>
+
+			<hr />
+			<h1> Add New Photo </h1>
+			<form action='{$link}' method='post'>			
+			Name: <input type='text' name='name'><br>
+			Description: <input type='textarea' name='desc'><br>
+			Path: <input type='text' name='path'><br>
+			<input type='hidden' name='nonce' value='{$create_photo_nonce}' />
+			<input type='hidden' name='action' value='mp_create_photo' />
+
+			<input type='submit'>
+			</form>
+
+			<hr />
+			<h1> Get Photo </h1>
+			<form action='{$link}' method='post'>
+			id: <input type='text' name='id'><br>
+			<input type='hidden' name='nonce' value='{$get_photo_nonce}' />
+			<input type='hidden' name='action' value='mp_get_photo' />
+
+			<input type='submit'>
+			</form>
+
+			<hr />
+			<h1> Get Photos </h1>
+			<form action='{$link}' method='post'>			
+			<input type='hidden' name='nonce' value='{$get_photos_nonce}' />
+			<input type='hidden' name='action' value='mp_get_photos' />
+
+			<input type='submit'>
+			</form>
+
+			<hr />
+			<h1> Update Photo </h1>
+			<form action='{$link}' method='post'>
+			ID: <input type='text' name='id'><br>
+			Name: <input type='text' name='name'><br>
+			Description: <input type='textarea' name='desc'><br>
+			Path: <input type='text' name='path'><br>
+			<input type='hidden' name='nonce' value='{$update_photo_nonce}' />
+			<input type='hidden' name='action' value='mp_update_photo' />
+
+			<input type='submit'>
+			</form>
+
+			<hr />
+			<h1> Delete Photo </h1>
+			<form action='{$link}' method='post'>
+			ID: <input type='text' name='id'><br>
+			<input type='hidden' name='nonce' value='{$delete_photo_nonce}' />
+			<input type='hidden' name='action' value='mp_delete_photo' />
+
+			<input type='submit'>
+			</form>
+
+			<hr />
+			<h1> Add Photo to Album </h1>
+			<form action='{$link}' method='post'>
+			Album ID: <input type='text' name='album_id'><br>
+			Photo ID: <input type='text' name='photo_id'><br>
+			<input type='hidden' name='nonce' value='{$add_album_photo_nonce}' />
+			<input type='hidden' name='action' value='mp_add_album_photo' />
+
+			<input type='submit'>
+			</form>
+
+			<hr />
+			<h1> Get Album Photos </h1>
+			<form action='{$link}' method='post'>
+			Album ID: <input type='text' name='album_id'><br>
+			<input type='hidden' name='nonce' value='{$get_album_photos_nonce}' />
+			<input type='hidden' name='action' value='mp_get_album_photos' />
+
+			<input type='submit'>
+			</form>
+
+			<hr />
+			<h1> Delete Photo from Album </h1>
+			<form action='{$link}' method='post'>
+			Album ID: <input type='text' name='album_id'><br>
+			Photo ID: <input type='text' name='photo_id'><br>
+			<input type='hidden' name='nonce' value='{$delete_album_photo_nonce}' />
+			<input type='hidden' name='action' value='mp_delete_album_photo' />
+
+			<input type='submit'>
+			</form>
+
+
 		";
-		// return "<a class=\"user_vote\" data-nonce=\"{$nonce}\" href=\"$link\">Create Album</a>";
 	}
 }
