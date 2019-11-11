@@ -179,6 +179,7 @@ class Mp_Photo_Manager
 
 		// Register AJAX actions for Photo Manager.
 		$this->loader->add_action('wp_ajax_mp_create_album', $plugin_public, 'mp_create_album');
+		$this->loader->add_action('wp_ajax_mp_delete_album', $plugin_public, 'mp_delete_album');
 	}
 
 	/**
@@ -244,18 +245,30 @@ class Mp_Photo_Manager
 	 */
 	public function mp_album_manager_shortcode()
 	{
-		$nonce = wp_create_nonce("mp_create_album_nonce");
+		$create_album_nonce = wp_create_nonce("mp_create_album_nonce");
+		$delete_album_nonce = wp_create_nonce("mp_delete_album_nonce");
 		// $link = admin_url("admin-ajax.php?action=mp_create_album&name=john&nonce={$nonce}");
 		$link = admin_url("admin-ajax.php");
 		return "
 			<form action='{$link}' method='post'>
 			Name: <input type='text' name='name'><br>
 			Description: <input type='textarea' name='desc'><br>
-			<input type='hidden' name='nonce' value='{$nonce}' />
+			<input type='hidden' name='nonce' value='{$create_album_nonce}' />
 			<input type='hidden' name='action' value='mp_create_album' />
 
 			<input type='submit'>
 			</form>
+
+			<hr />
+			<h1> Delete Album </h1>
+			<form action='{$link}' method='post'>
+			ID: <input type='text' name='id'><br>
+			<input type='hidden' name='nonce' value='{$delete_album_nonce}' />
+			<input type='hidden' name='action' value='mp_delete_album' />
+
+			<input type='submit'>
+			</form>
+
 		";
 		// return "<a class=\"user_vote\" data-nonce=\"{$nonce}\" href=\"$link\">Create Album</a>";
 	}

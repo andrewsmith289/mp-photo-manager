@@ -117,4 +117,19 @@ class Mp_Photo_Manager_Public
 
 		Mp_Photo_Manager_Db::create_album($name, $desc);
 	}
+
+	/**
+	 * Ajax callback for the Delete Album action.
+	 *
+	 * @since    1.0.0
+	 */
+	public function mp_delete_album()
+	{
+		if (!wp_verify_nonce($_REQUEST['nonce'], "mp_delete_album_nonce")) {
+			exit("Couldn't verify nonce.");
+		}
+		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+
+		Mp_Photo_Manager_Db::delete_album($id);
+	}
 }

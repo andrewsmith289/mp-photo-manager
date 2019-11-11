@@ -70,6 +70,9 @@ class Mp_Photo_Manager_Db
     $userId = get_current_user_id();
     $now = time();
 
+    $name = esc_sql($name);
+    $desc = esc_sql($desc);
+
     $qry = "INSERT INTO {$dbName}.albums (user_id, title, description, created, updated)
       VALUES ({$userId}, '{$name}', '{$desc}', FROM_UNIXTIME({$now}), FROM_UNIXTIME({$now}))
     ";
@@ -84,7 +87,28 @@ class Mp_Photo_Manager_Db
    */
   public static function delete_album($album_id)
   {
-    // Delete album
+    global $wpdb;
+    $dbName = "mp_photo_manager";
+
+    $userId = get_current_user_id();
+    $album_id = esc_sql($album_id);
+
+    // Check Album exists and belongs to user.
+    $qry = "SELECT * FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id} 
+    ";
+    $result = $wpdb->get_results($qry);
+
+    if (count($result) == 0) {
+      echo "Album not found in database, or doesn't belong to you.";
+      return;
+    }
+
+    // Delete Album
+    $qry = "DELETE FROM {$dbName}.albums WHERE user_id={$userId} AND id={$album_id} 
+    ";
+    $wpdb->get_results($qry);
+
+    echo "Album deleted.";
   }
 
   /**
