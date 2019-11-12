@@ -2,3 +2,124 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+
+#mp_photo_manager * {
+  border: 1px solid black;
+}
+
+#mp_photo_manager {
+  display: grid;
+
+  /* grid-template-columns: 80% 20%;
+  grid-template-rows: 80% 20%; */
+  grid-template-rows: 2fr 1fr;
+  grid-template-columns: 1.75fr .65fr;
+}
+
+#mp_photo_manager h1 {
+  font-size: 14px;
+}
+
+#mp_photo_manager h2 {
+  font-size: 12px;
+}
+
+#mp_photo_manager .photo-large {
+  grid-column-start: 1;
+  grid-column-end: 1;
+
+  grid-row-start: 1;
+  grid-row-end: 1;
+}
+
+#mp_photo_manager .album-strip {
+  grid-column-start: 1;
+  grid-column-end: 2;
+
+  grid-row-start: 2;
+  grid-row-end: 2;
+
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+
+#mp_photo_manager .photo-strip {
+  grid-column-start: 2;
+  grid-column-end: 2;
+
+  grid-row-start: 1;
+  grid-row-end: 3;
+}
+
+
+
+#mp_photo_manager .album-list {
+  display: flex;
+  align-items: center;
+  padding: .5rem;
+
+}
+
+#mp_photo_manager .album {
+  padding: .25rem;
+  height: 128px;
+}
+
+#mp_photo_manager .photo-list {
+  display: flex;
+  flex-direction: column;
+
+
+}
+
+#mp_photo_manager .photo {
+  align-self: center;
+  padding: .25rem;
+  width: 8rem;
+  height: 128px;
+}
+
+#mp_photo_manager .upload-photo {
+  display: flex;
+  width: 8rem;
+  justify-content: center;
+  align-self: center;
+
+}
+
+#mp_photo_manager h1:not(.site-title):before,
+#mp_photo_manager h2:before {
+  content: none;
+}
+
+
+@media only screen and (max-width: 480px) {
+
+  /* your CSS here */
+  #mp_photo_manager {
+    display: grid;
+    grid-template-columns: initial;
+  }
+
+  #mp_photo_manager .photo-large {
+    grid-column-start: 1;
+    /* grid-column-end: 2; */
+    grid-row-start: 2;
+    grid-row-end: 2;
+  }
+
+  #mp_photo_manager .album-strip {
+    /* grid-column-start: 1;
+    grid-column-end: 2; */
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-template-columns: 1fr 3fr;
+  }
+
+  #mp_photo_manager .photo-strip {
+    grid-column-start: 1;
+    /* grid-column-end: 2; */
+    grid-row-start: 3;
+    /* grid-row-end: 3; */
+  }
+}

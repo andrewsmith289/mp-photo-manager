@@ -75,8 +75,8 @@ class Mp_Photo_Manager_Public
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/mp-photo-manager-public.css', array(), $this->version, 'all');
+		wp_enqueue_style('jquery-modal', 'https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -98,8 +98,34 @@ class Mp_Photo_Manager_Public
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
+		wp_enqueue_script('jquery-modal', 'https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js', array('jquery'), $this->version, false);
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/mp-photo-manager-public.js', array('jquery'), $this->version, false);
+
+		// Localize script with nonces
+		wp_localize_script(
+			$this->plugin_name,
+			'mp_ajax_object',
+			[
+				'ajax_url' => admin_url('admin-ajax.php'),
+
+				'create_album_nonce' => wp_create_nonce("mp_create_album_nonce"),
+				'get_album_nonce' => wp_create_nonce("mp_get_album_nonce"),
+				'get_albums_nonce' => wp_create_nonce("mp_get_albums_nonce"),
+				'update_album_nonce' => wp_create_nonce("mp_update_album_nonce"),
+				'delete_album_nonce' => wp_create_nonce("mp_delete_album_nonce"),
+
+				'create_photo_nonce' => wp_create_nonce("mp_create_photo_nonce"),
+				'get_photo_nonce' => wp_create_nonce("mp_get_photo_nonce"),
+				'get_photos_nonce' => wp_create_nonce("mp_get_photos_nonce"),
+				'update_photo_nonce' => wp_create_nonce("mp_update_photo_nonce"),
+				'delete_photo_nonce' => wp_create_nonce("mp_delete_photo_nonce"),
+
+				'add_album_photo_nonce' => wp_create_nonce("mp_add_album_photo_nonce"),
+				'get_album_photo_nonce' => wp_create_nonce("mp_add_album_photo_nonce"),
+				'delete_album_photo_nonce' => wp_create_nonce("mp_add_album_photo_nonce")
+			]
+		);
 	}
 
 	/**

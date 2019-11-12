@@ -276,6 +276,58 @@ class Mp_Photo_Manager
 
 		$link = admin_url("admin-ajax.php");
 		return "
+			<div id='mp_photo_manager'>
+  <div class='photo-large'>
+    <img href='#' alt='Photo name' />
+  </div>
+  <div class='album-strip'>
+    <div class='album-details'>
+      <h1>Album Details</h1>
+      <h2 class='album-name'>Album Name</h2>
+      <p class='album-description'>Album Description</p>
+    </div>
+    <div class='album-list'>
+      <div class='album'>
+        <span class='album-name'>Album Name</span>
+        <span class='delete-album'>X</span>
+      </div>
+      <div class='create-album'>
+        <a href='#modal_new_album' rel='modal:open'>+ New Album</a>
+			</div>
+			<div id='modal_new_album' class='modal'>
+				<h1> Create Album </h1>
+			<form id='mp_create_album'>
+				Name: <input id='mp_name' type='text' name='name'><br>
+				Description: <input id='mp_desc' type='textarea' name='desc'><br>
+				<input type='hidden' name='nonce' value='{$create_album_nonce}' />
+				<input type='hidden' name='action' value='mp_create_album' />
+
+				<button id='save_new_album'>Save</button>
+			</form>
+				<a class='mp-close' href='#' rel='modal:close'>Close</a>
+			</div>
+    </div>
+  </div>
+  <div class='photo-strip'>
+    <div class='photo-details'>
+      <h1>Photo Details</h1>
+      <h2 class='photo-name'>Photo Name</h2>
+      <p class='photo-description'>Photo Description</p>
+    </div>
+    <div class='photo-list'>
+			<div class='photo'>
+				<img href='#' alt='thumbnail' />
+        <span class='photo-name'>Photo Name</span>
+        <span class='delete-photo'>X</span>
+      </div>
+      <div class='upload-photo'>
+        + Upload Photo
+      </div>
+    </div>
+  </div>
+</div>
+
+
 			<h1> Create Album </h1>
 			<form action='{$link}' method='post'>
 			Name: <input type='text' name='name'><br>
