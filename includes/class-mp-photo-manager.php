@@ -288,13 +288,15 @@ class Mp_Photo_Manager
     </div>
     <div class='album-list'>
       <div class='album'>
-        <span class='album-name'>Album Name</span>
+        <h3 class='album-name'>Album Name</h3>
         <span class='delete-album'>X</span>
       </div>
       <div class='create-album'>
-        <a href='#modal_new_album' rel='modal:open'>+ New Album</a>
+        <a class='btn' href='#modal_new_album' rel='modal:open'>+ New Album</a>
 			</div>
-			<div id='modal_new_album' class='modal'>
+			
+		</div>
+		<div id='modal_new_album' class='modal'>
 				<h1> Create Album </h1>
 			<form id='mp_create_album'>
 				Name: <input id='mp_name' type='text' name='name'><br>
@@ -306,7 +308,6 @@ class Mp_Photo_Manager
 			</form>
 				<a class='mp-close' href='#' rel='modal:close'>Close</a>
 			</div>
-    </div>
   </div>
   <div class='photo-strip'>
     <div class='photo-details'>

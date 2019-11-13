@@ -1,5 +1,5 @@
 (function($) {
-  'use strict';
+  "use strict";
 
   /**
    * All of the code for your public-facing JavaScript source
@@ -29,53 +29,78 @@
    * practising this, we should strive to set a better example in our own work.
    */
   jQuery(function() {
-    jQuery('button#save_new_album').click(function(event) {
-      event.preventDefault();
-      console.log('hi');
+    // Load Albums on load
+    loadAlbums();
 
-      const name = $('#mp_create_album input#mp_name').val();
-      const desc = $('#mp_create_album input#mp_desc').val();
-      const data = {
-        action: 'mp_create_album',
-        name: name,
-        desc: desc,
-        create_album_nonce: mp_ajax_object.create_album_nonce
-      };
-      console.log(mp_ajax_object.ajax_url + '&action=mp_create_album');
+    function loadAlbums() {
       $.ajax({
-        url: mp_ajax_object.ajax_url + '?action=mp_create_album',
-        type: 'post',
-        dataType: 'json',
-        data: $('form#mp_create_album').serialize(),
+        url: mp_ajax_object.ajax_url + "?action=mp_get_albums",
+        type: "post",
+        dataType: "json",
+        data: {
+          nonce: mp_ajax_object.get_albums_nonce
+        },
         success: function(data) {
-          console.log('success!');
-          $('#modal_new_album a.mp-close').click();
+          $("#mp_photo_manager .album-list").empty();
+
+          // Build Album list
+          for (let album in data) {
+            const albumTitle = data[album].title;
+            $("#mp_photo_manager .album-list").append(
+              `<div class='album'>
+									<h3 class='album-name'>${albumTitle}</h3>
+									<span class='delete-album'>X</span>
+								</div>`
+            );
+          }
+
+          // Add the New Album button to the end
+          $(".album-list").append(`
+					<div class='create-album'>
+						<a class='btn' href='#modal_new_album' rel='modal:open'>+ New Album</a>
+					</div>
+          `);
         }
       });
-    });
-
-    function loadAlbums() {}
+    }
 
     function loadAlbumDetails() {}
 
     function loadPhotos() {}
 
     function loadPhotoDetails() {}
+
+    $("button#save_new_album").click(function(event) {
+      event.preventDefault();
+
+      // const name = $('#mp_create_album input#mp_name').val();
+      // const desc = $('#mp_create_album input#mp_desc').val();
+      // const data = {
+      //   action: 'mp_create_album',
+      //   name: name,
+      //   desc: desc,
+      //   create_album_nonce: mp_ajax_object.create_album_nonce
+      // };
+      $.ajax({
+        url: mp_ajax_object.ajax_url + "?action=mp_create_album",
+        type: "post",
+        dataType: "json",
+        data: $("form#mp_create_album").serialize(),
+        success: function(data) {
+          $("#modal_new_album a.mp-close").click();
+        }
+      });
+
+      setTimeout(function() {
+        loadAlbums();
+      }, 750);
+    });
+
+    const el = "#mp_photo_manager .album";
+    const className = "mp-selected";
+    $(document).on("click", el, function(event) {
+      $(el).removeClass(className);
+      $(event.target).addClass(className);
+    });
   });
-
-  // $.get(
-  //   mp_ajax_object.ajax_url,
-  //   {
-  //     action: 'mp_get_albums',
-  //     nonce: mp_ajax_object.get_albums_nonce
-  //   },
-  //   function(response) {
-  //     if (undefined !== response.success && false === response.success) {
-  //       return;
-  //     }
-
-  //     // Parse your response here.
-  //     console.log(response);
-  //   }
-  // );
 })(jQuery);

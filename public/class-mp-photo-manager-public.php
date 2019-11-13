@@ -122,8 +122,8 @@ class Mp_Photo_Manager_Public
 				'delete_photo_nonce' => wp_create_nonce("mp_delete_photo_nonce"),
 
 				'add_album_photo_nonce' => wp_create_nonce("mp_add_album_photo_nonce"),
-				'get_album_photo_nonce' => wp_create_nonce("mp_add_album_photo_nonce"),
-				'delete_album_photo_nonce' => wp_create_nonce("mp_add_album_photo_nonce")
+				'get_album_photo_nonce' => wp_create_nonce("mp_get_album_photo_nonce"),
+				'delete_album_photo_nonce' => wp_create_nonce("mp_delete_album_photo_nonce")
 			]
 		);
 	}
