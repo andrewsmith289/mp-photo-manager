@@ -268,7 +268,7 @@ class Mp_Photo_Manager_Db
     $userId = get_current_user_id();
 
     // Get Photos.
-    $qry = "SELECT photo_id, album_id, photos.description, path, added, photos.created, photos.updated FROM {$dbName}.photos_albums
+    $qry = "SELECT photo_id, album_id, photos.title, photos.description, path, added, photos.created, photos.updated FROM {$dbName}.photos_albums
       INNER JOIN {$dbName}.albums on photos_albums.album_id = albums.id
       INNER JOIN {$dbName}.photos on photos_albums.photo_id = photos.id    
       WHERE albums.id={$album_id} 
@@ -355,7 +355,7 @@ class Mp_Photo_Manager_Db
     }
 
     // Return the Photo
-    return $result;
+    return $result[0];
   }
 
   /**
