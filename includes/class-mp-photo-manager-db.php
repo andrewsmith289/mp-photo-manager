@@ -70,6 +70,11 @@ class Mp_Photo_Manager_Db
    */
   public static function create_album($name, $desc = "")
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
 
     global $wpdb;
     $dbName = "mp_photo_manager";
@@ -85,6 +90,8 @@ class Mp_Photo_Manager_Db
       VALUES ({$userId}, '{$name}', '{$desc}', FROM_UNIXTIME({$now}), FROM_UNIXTIME({$now}))
     ";
     $wpdb->get_results($qry);
+
+    return $wpdb->insert_id;
   }
 
   /**
@@ -95,6 +102,11 @@ class Mp_Photo_Manager_Db
    */
   public static function get_album($id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
 
     global $wpdb;
     $dbName = "mp_photo_manager";
@@ -124,13 +136,21 @@ class Mp_Photo_Manager_Db
    */
   public static function get_albums()
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
     $userId = get_current_user_id();
 
     // Get Photos.
     $qry = "SELECT * FROM {$dbName}.albums 
-      WHERE user_id={$userId}";
+      WHERE user_id={$userId}
+      ORDER BY
+      updated DESC";
     $result = $wpdb->get_results($qry);
 
     return $result;
@@ -145,6 +165,12 @@ class Mp_Photo_Manager_Db
    */
   public static function delete_album($album_id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
 
@@ -171,6 +197,12 @@ class Mp_Photo_Manager_Db
    */
   public static function update_album($id, $name, $desc)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     // Update album details
     global $wpdb;
     $dbName = "mp_photo_manager";
@@ -205,6 +237,12 @@ class Mp_Photo_Manager_Db
    */
   private static function album_exists($album_id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     // Check Photo exists and belongs to user.
     global $wpdb;
     $dbName = "mp_photo_manager";
@@ -231,6 +269,12 @@ class Mp_Photo_Manager_Db
    */
   public static function add_album_photo($album_id, $photo_id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
 
@@ -263,6 +307,12 @@ class Mp_Photo_Manager_Db
    */
   public static function get_album_photos($album_id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
     $userId = get_current_user_id();
@@ -270,7 +320,7 @@ class Mp_Photo_Manager_Db
     // Get Photos.
     $qry = "SELECT photo_id, album_id, photos.title, photos.description, path, added, photos.created, photos.updated FROM {$dbName}.photos_albums
       INNER JOIN {$dbName}.albums on photos_albums.album_id = albums.id
-      INNER JOIN {$dbName}.photos on photos_albums.photo_id = photos.id    
+      INNER JOIN {$dbName}.photos on photos_albums.photo_id = photos.id
       WHERE albums.id={$album_id} 
         AND albums.user_id={$userId}";
     $result = $wpdb->get_results($qry);
@@ -285,6 +335,12 @@ class Mp_Photo_Manager_Db
    */
   public static function delete_album_photo($album_id, $photo_id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
 
@@ -315,6 +371,12 @@ class Mp_Photo_Manager_Db
    */
   public static function create_photo($name, $desc, $path)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
 
@@ -338,6 +400,12 @@ class Mp_Photo_Manager_Db
    */
   public static function get_photo($id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
 
@@ -365,6 +433,12 @@ class Mp_Photo_Manager_Db
    */
   public static function get_photos()
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
     $userId = get_current_user_id();
@@ -384,6 +458,12 @@ class Mp_Photo_Manager_Db
    */
   public static function update_photo($id, $name, $desc, $path)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
     $now = time();
@@ -413,6 +493,12 @@ class Mp_Photo_Manager_Db
    */
   public static function delete_photo($photo_id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     global $wpdb;
     $dbName = "mp_photo_manager";
     $userId = get_current_user_id();
@@ -437,6 +523,12 @@ class Mp_Photo_Manager_Db
    */
   private static function photo_exists($photo_id)
   {
+    if (!is_user_logged_in()) {
+      $res = [];
+      $res['error'] = 'not logged in.';
+      return $res;
+    }
+
     // Check Photo exists and belongs to user.
     global $wpdb;
     $dbName = "mp_photo_manager";

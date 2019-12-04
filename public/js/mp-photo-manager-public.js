@@ -30,7 +30,7 @@
    */
   jQuery(function() {
     // Load Albums on load
-    loadAlbums();
+    //loadAlbums();
 
     function loadAlbums() {
       $.ajax({
